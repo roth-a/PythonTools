@@ -10,14 +10,6 @@ def ptable(f, arglist, processes=cpu_count()):
         result = pool.map(f, arglist)  
         return result
         print ('pool map complete')
-    except KeyboardInterrupt:
-        print ('got ^C while pool mapping, terminating the pool')
-        pool.terminate()
-        print ('pool is terminated')
-    except Exception:
-        print ('got exception: terminating the pool')
-        pool.terminate()
-        print ('pool is terminated')
     finally:
         print ('joining pool processes')
         pool.close()
