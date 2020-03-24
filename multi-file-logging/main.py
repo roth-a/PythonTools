@@ -12,6 +12,21 @@ if len(logger.handlers)==0:
 	logger.addHandler(handler)
 
 
+
+# optional linux notify messages
+# import subprocess as s
+# class NotifyHandler(logging.Handler):
+# 	def emit(self, record):
+# 		log_entry = self.format(record)
+# 		s.call(['notify-send','My app', str(log_entry)])
+
+# nh = NotifyHandler()
+# nh.setLevel(logging.DEBUG)
+# logger.addHandler(nh)
+
+
+
+
 import logger_decorator
 log_decorator = logger_decorator.get_logger_decorator(logger, write_in_new_line=False)
 
