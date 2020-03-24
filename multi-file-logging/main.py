@@ -1,7 +1,7 @@
-import logging, sys
+import logging, sys, os
 
 
-logger = logging.getLogger('decorator-log')
+logger = logging.getLogger(str(os.getpid()))
 logger.setLevel(logging.DEBUG)
 if len(logger.handlers)==0:
 	# writing to stdout
