@@ -1,12 +1,13 @@
 #%%
 import numpy as np
+import datetime
 
 class JsonTable():
 	def __init__(self):
 		self.table = [[]]
 		self.data = {}
 
-	def write_table(self, row, column, value):
+	def write_table(self, row, column, value, convert_date_to_str=True):
 		delta_row = len(self.table) - row
 		if delta_row <= 0:
 			self.table += [[] for i in range(-delta_row+1)]
@@ -15,7 +16,10 @@ class JsonTable():
 		if delta_column <= 0:
 			self.table[row] += [None for i in range(-delta_column+1)]
 
-		self.table[row][column] = value
+		if convert_date_to_str and isinstance(value, datetime.datetime):
+			self.table[row][column] = str(value)
+		else:
+			self.table[row][column] = value
 
 
 
