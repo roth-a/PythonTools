@@ -58,6 +58,8 @@ def threadtable(f, arglist, max_workers=8):
 def rate_limited(max_per_second):
 	"""
 		This is a rate limiter from https://gist.github.com/gregburek/1441055
+
+		This can be combined with threadtable
 	"""
 	lock = threading.Lock()
 	min_interval = 1.0 / max_per_second
