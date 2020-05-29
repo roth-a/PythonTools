@@ -23,7 +23,7 @@ def ptable(f, arglist, max_workers=cpu_count()):
 	logger.debug('Starting {} processes {}({})'.format(max_workers, str(f), str(arglist)))
 	try:
 		print ('starting the pool map')
-		pool = Pool(processes=max_workers)
+		pool = Pool(processes=int(max_workers))
 		result = pool.map(f, arglist)
 		return result
 		print ('pool map complete')
@@ -40,7 +40,7 @@ def ptable(f, arglist, max_workers=cpu_count()):
 
 
 def threadtable(f, arglist, max_workers=8):
-	with ThreadPoolExecutor(max_workers=max_workers) as executor:
+	with ThreadPoolExecutor(max_workers=int(max_workers)) as executor:
 		logger.debug('Starting {} threads {}({})'.format(max_workers, str(f), str(arglist)))
 		res =  []
 		for arg in arglist:
@@ -57,6 +57,8 @@ def rate_limited_threadtable(f, arglist, rate_limit=30):
 	"""
 	It guarantees that less than rate_limit processes run at the same time
 	AND no more than rate_limit/second processes were started.
+
+	However the entire threadPool will take at least 1 second.
 
 
 	You can test the function with this code:
@@ -80,7 +82,7 @@ def rate_limited_threadtable(f, arglist, rate_limit=30):
 			time.sleep(min_duration - duration)
 		return ret
 
-	return threadtable(rate_limited_f, arglist, max_workers=rate_limit)
+	return threadtable(rate_limited_f, arglist, max_workers=int(rate_limit))
 
 
 
