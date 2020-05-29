@@ -15,20 +15,23 @@ logger.debug('Loaded '+ __file__)
 from multiprocessing import Pool
 from multiprocessing import cpu_count
 from concurrent.futures.thread import ThreadPoolExecutor
+
+import threading
 import time
+from functools import wraps
 
 
 
-def ptable(f, arglist, processes=cpu_count()):
-	logger.debug('Starting {} processes {}({})'.format(processes, str(f), str(arglist)))
+def ptable(f, arglist, max_workers=cpu_count()):
+	logger.debug('Starting {} processes {}({})'.format(max_workers, str(f), str(arglist)))
 	try:
 		print ('starting the pool map')
-		pool = Pool(processes=processes)
+		pool = Pool(processes=max_workers)
 		result = pool.map(f, arglist)
 		return result
 		print ('pool map complete')
 	finally:
-		print ('joining pool processes')
+		print ('joining pool max_workers')
 		pool.close()
 		pool.join()
 		print ('join complete')
@@ -46,6 +49,40 @@ def threadtable(f, arglist, max_workers=8):
 		for arg in arglist:
 			res.append(executor.submit(f, arg))
 	return [r.result() for r in res]
+
+
+
+
+
+
+def rate_limited(max_per_second):
+	"""
+		This is a rate limiter from https://gist.github.com/gregburek/1441055
+	"""
+	lock = threading.Lock()
+	min_interval = 1.0 / max_per_second
+
+	def decorate(func):
+		last_time_called = time.perf_counter()
+
+		@wraps(func)
+		def rate_limited_function(*args, **kwargs):
+			lock.acquire()
+			nonlocal last_time_called
+			elapsed = time.perf_counter() - last_time_called
+			left_to_wait = min_interval - elapsed
+
+			if left_to_wait > 0:
+				time.sleep(left_to_wait)
+
+			ret = func(*args, **kwargs)
+			last_time_called = time.perf_counter()
+			lock.release()
+			return ret
+
+		return rate_limited_function
+
+	return decorate
 
 
 #
