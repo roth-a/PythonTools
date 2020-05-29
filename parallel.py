@@ -76,7 +76,7 @@ def rate_limited_threadtable(f, arglist, rate_limit=30):
 
 		duration = time.time() - start
 		if duration < min_duration:
-			print('Sleeping {}s'.format(min_duration - duration))
+# 			print('Sleeping {}s'.format(min_duration - duration))
 			time.sleep(min_duration - duration)
 		return ret
 
