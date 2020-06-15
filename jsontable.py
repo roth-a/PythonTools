@@ -18,6 +18,8 @@ class JsonTable():
 
 		if convert_date_to_str and isinstance(value, datetime.datetime):
 			self.table[row][column] = str(value)
+		elif isinstance(value, bool):
+			self.table[row][column] = str(value)
 		else:
 			self.table[row][column] = value
 
