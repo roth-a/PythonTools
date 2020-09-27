@@ -1,6 +1,17 @@
 
 import numpy as np
 
+
+def trim_list(l, f_is_empty):
+	for i in reversed(range(len(l))):
+		if f_is_empty(l[i]):
+			del l[i]
+	return l
+
+
+def empty_array():
+	return  np.empty([0,0], dtype=object)
+
 def merge_2d_arrays(a, b, b_pos, empty_cell="", transparent_in_b=None):
 	"""
 	Given a 2d array a. It playces the 2d array b at the position (b_pos[0],b_pos[1])

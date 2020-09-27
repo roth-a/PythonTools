@@ -2,6 +2,70 @@
 import numpy as np
 import datetime
 
+
+
+def flatten_structure(s1):
+	"""
+	This flattens an arbitrary dict / list deep structure to a dict with depth 1.
+
+	Parameters
+	----------
+	s1 : TYPE
+		DESCRIPTION.
+
+	Returns
+	-------
+	s : TYPE
+		This leaves the input unchanged and creates a new dictionary
+
+	"""
+	if isinstance(s1, (list, tuple)):
+		s = {str(i):s1[i] for i in range(len(s1))}
+	else:
+		s = s1.copy()
+
+	if isinstance(s, dict):
+		for key in list(s.keys()):
+			if isinstance(s[key], (dict, list, tuple)):   # replace here a deep structure of a value by the flattened structure
+				for sub_key, sub_value in flatten_structure(s[key]).items():
+					s['.'.join([str(key), str(sub_key)])] = sub_value
+				del s[key]
+	return s
+
+
+
+
+def write_in_structure(structure, key, value, overwrite_warning=True, logger=None):
+	keys = key.split('.')
+	print(keys)
+	base_key = keys[0]
+	remaining_key = '.'.join(keys[1:]) if len(keys) > 1 else None # None means we are at the lowest level
+	# format basekey and define/extend structure if necessary
+	if base_key.isnumeric():
+		base_key = int(base_key)
+		if structure == None: structure = list()
+		if isinstance(structure, (list)) and len(structure)<= base_key:
+			structure += [None for i in range(1+ base_key - len(structure))]
+			print(structure)
+		elif overwrite_warning  and remaining_key == None and logger:
+ 			logger.warning('{} of total_key {} exists in structure already. Overwriting'.format(base_key, key))
+	else:
+		if structure == None: structure = dict()
+		if base_key in structure and remaining_key == None and overwrite_warning  and logger:
+ 			logger.warning('{} of total_key {} exists in structure already. Overwriting'.format(base_key, key))
+		if base_key not in structure: structure[base_key] = None
+
+
+
+	# add values /do recursion
+	if remaining_key is None:
+		structure[base_key] = value
+	else:
+		structure[base_key] = write_in_structure(structure[base_key], remaining_key, value,
+										   overwrite_warning=overwrite_warning, logger=logger)
+	return structure
+
+
 class JsonTable():
 	def __init__(self):
 		self.table = [[]]
@@ -127,8 +191,6 @@ class JsonTable():
 		rectanglify()
 
 		return self.table
-
-
 
 
 #%%
