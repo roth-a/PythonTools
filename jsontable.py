@@ -1,10 +1,11 @@
 #%%
 import numpy as np
 import datetime
+import re
 
 
 
-def flatten_structure(s1):
+def flatten_structure(s1, auto_escape_dot=True):
 	"""
 	This flattens an arbitrary dict / list deep structure to a dict with depth 1.
 
@@ -19,6 +20,10 @@ def flatten_structure(s1):
 		This leaves the input unchanged and creates a new dictionary
 
 	"""
+	def escape_dot(s):
+		return str(s).replace('.', '\.')
+	
+	
 	if isinstance(s1, (list, tuple)):
 		s = {str(i):s1[i] for i in range(len(s1))}
 	else:
@@ -28,28 +33,53 @@ def flatten_structure(s1):
 		for key in list(s.keys()):
 			if isinstance(s[key], (dict, list, tuple)):   # replace here a deep structure of a value by the flattened structure
 				for sub_key, sub_value in flatten_structure(s[key]).items():
-					s['.'.join([str(key), str(sub_key)])] = sub_value
+					s['.'.join([escape_dot(key), str(sub_key)])] = sub_value
 				del s[key]
 	return s
 
 
 
+def write_in_structure(structure, key, value, overwrite_warning=True, logger=None, max_list_len=1e8):
+	"""
+	
 
-def write_in_structure(structure, key, value, overwrite_warning=True, logger=None):
-	keys = key.split('.')
-	print(keys)
-	base_key = keys[0]
+	Parameters
+	----------
+	structure : TYPE
+		DESCRIPTION.
+	key : TYPE
+		If you want to force a numeric value to be interpreted as a dict key and not list key, then add '{force_dict}'.
+		The character '.' can be escaped with '\.'
+	value : TYPE
+		DESCRIPTION.
+	overwrite_warning : TYPE, optional
+		DESCRIPTION. The default is True.
+	logger : TYPE, optional
+		DESCRIPTION. The default is None.
+	max_list_len : TYPE, optional
+		DESCRIPTION. The default is 1e8.
+
+	Returns
+	-------
+	None.
+
+	"""
+	keys = re.split(r'(?<!\\)\.', key)   # key.split('.')   , see https://stackoverflow.com/questions/18092354/python-split-string-without-splitting-escaped-character
+# 	print(keys)
+	base_key = keys[0].replace('\.', '.')
 	remaining_key = '.'.join(keys[1:]) if len(keys) > 1 else None # None means we are at the lowest level
 	# format basekey and define/extend structure if necessary
-	if base_key.isnumeric():
+	if base_key.isnumeric() and int(base_key) <= max_list_len:
 		base_key = int(base_key)
 		if structure == None: structure = list()
 		if isinstance(structure, (list)) and len(structure)<= base_key:
 			structure += [None for i in range(1+ base_key - len(structure))]
-			print(structure)
+# 			print(structure)
 		elif overwrite_warning  and remaining_key == None and logger:
  			logger.warning('{} of total_key {} exists in structure already. Overwriting'.format(base_key, key))
 	else:
+		if base_key.startswith('{force_dict}'):	base_key = base_key.replace('{force_dict}', '', 1)
+# 		print(base_key, type(base_key), structure)
 		if structure == None: structure = dict()
 		if base_key in structure and remaining_key == None and overwrite_warning  and logger:
  			logger.warning('{} of total_key {} exists in structure already. Overwriting'.format(base_key, key))
@@ -64,6 +94,8 @@ def write_in_structure(structure, key, value, overwrite_warning=True, logger=Non
 		structure[base_key] = write_in_structure(structure[base_key], remaining_key, value,
 										   overwrite_warning=overwrite_warning, logger=logger)
 	return structure
+
+
 
 
 class JsonTable():
@@ -146,7 +178,7 @@ class JsonTable():
 						data[key] = value
 
 				for i in range(start_row+1, len(table)):
-					if not (table[i,0] is None or table[i,0] is ''):
+					if not (table[i,0] is None or table[i,0] == ''):
 						my_append(key, rec_table2json(table[start_row:i,1:]))
 						key = table[i,0]
 						start_row = i
