@@ -67,10 +67,10 @@ def merge_2d_arrays(a, b, b_pos, empty_cell='', transparent_in_b=None):
 	return full
 
 
-def append_right(a, b, empty_cell=""):
+def append_right(a, b, empty_cell="", row_shift=0, col_shift=0):
 	a = np.array(a)
-	return merge_2d_arrays(a, b, [0, a.shape[1]], empty_cell=empty_cell)
+	return merge_2d_arrays(a, b, [row_shift, col_shift + a.shape[1]], empty_cell=empty_cell)
 
-def append_bottom(a, b, empty_cell=""):
+def append_bottom(a, b, empty_cell="", row_shift=0, col_shift=0):
 	a = np.array(a)
-	return merge_2d_arrays(a, b, [a.shape[0], 0], empty_cell=empty_cell)
+	return merge_2d_arrays(a, b, [row_shift + a.shape[0], col_shift], empty_cell=empty_cell)
