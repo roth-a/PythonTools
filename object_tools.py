@@ -15,5 +15,5 @@ def object_walker(o, max_depth = 2):
 			else:
 				d[name] = object_walker(sub_o, max_depth=max_depth-1)
 		except:
-			continue
+			pass
 	return d

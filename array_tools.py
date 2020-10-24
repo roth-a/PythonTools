@@ -47,8 +47,8 @@ def merge_2d_arrays(a, b, b_pos, empty_cell='', transparent_in_b=None):
 
 		full = merge_2d_arrays(a, b, b_pos, transparent_in_b="a")
 	"""
-	a = np.array(a)
-	b = np.array(b)
+	a = np.array(a,dtype=object)
+	b = np.array(b,dtype=object)
 	a_v = np.empty( [ max(0,b_pos[0] - a.shape[0] + b.shape[0])  , 
 				  a.shape[1] ]  ,dtype=object)
 	a_right = np.empty( [ max(a.shape[0] + a_v.shape[0],   b_pos[0] + b.shape[0])  , 
