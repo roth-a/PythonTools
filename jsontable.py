@@ -26,6 +26,8 @@ def flatten_structure(s1, auto_escape_dot=True):
 	
 	if isinstance(s1, (list, tuple)):
 		s = {str(i):s1[i] for i in range(len(s1))}
+	elif isinstance(s1, (str, int, float)):
+		s = s1
 	else:
 		s = s1.copy()
 
@@ -71,7 +73,7 @@ def write_in_structure(structure, key, value, overwrite_warning=True, logger=Non
 	# format basekey and define/extend structure if necessary
 	if base_key.isnumeric() and int(base_key) <= max_list_len:
 		base_key = int(base_key)
-		if structure == None: structure = list()
+		if structure is None: structure = list()
 		if isinstance(structure, (list)) and len(structure)<= base_key:
 			structure += [None for i in range(1+ base_key - len(structure))]
 # 			print(structure)
@@ -80,8 +82,8 @@ def write_in_structure(structure, key, value, overwrite_warning=True, logger=Non
 	else:
 		if base_key.startswith('{force_dict}'):	base_key = base_key.replace('{force_dict}', '', 1)
 # 		print(base_key, type(base_key), structure)
-		if structure == None: structure = dict()
-		if base_key in structure and remaining_key == None and overwrite_warning  and logger:
+		if structure is None: structure = dict()
+		if base_key in structure and remaining_key is None and overwrite_warning  and logger:
  			logger.warning('{} of total_key {} exists in structure already. Overwriting'.format(base_key, key))
 		if base_key not in structure: structure[base_key] = None
 

@@ -16,4 +16,6 @@ def object_walker(o, max_depth = 2):
 				d[name] = object_walker(sub_o, max_depth=max_depth-1)
 		except:
 			pass
+		finally:
+			d[name] = 'exception'
 	return d
