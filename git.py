@@ -12,15 +12,14 @@ logger.debug('Loaded '+ __file__)
 
 
 from git import Repo
-this_dir = os.path.dirname( __file__)
 
 def clone_checkout_pull(url, root_dir='.', branch='master'):
 	name = url.split('/')[-1].split('.')[0]
-	if not os.path.isdir(os.path.join(this_dir, name)):	
-		repo = Repo.clone_from(url,  os.path.join( this_dir, name ))
+	if not os.path.isdir(os.path.join(root_dir, name)):
+		repo = Repo.clone_from(url,  os.path.join( root_dir, name ))
 		repo.git.checkout(branch)
 	else:
-		repo = Repo( os.path.join( this_dir, name ))
+		repo = Repo( os.path.join( root_dir, name ))
 		repo.git.checkout(branch)
 		repo.remotes[0].pull()
 	return repo
